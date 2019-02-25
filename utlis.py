@@ -93,6 +93,7 @@ def adjust_box(poly):
 
 def rbbox_transform(ex_rois, gt_rois):
 
+    
     """
     implement rotating bounding box
     """
@@ -109,13 +110,10 @@ def rbbox_transform(ex_rois, gt_rois):
 	gt_angle = gt_rois[:, 4]
 
 	targets_dx = (gt_ctr_x - ex_ctr_x)*1.0 / ex_widths
-    	targets_dy = (gt_ctr_y - ex_ctr_y)*1.0 / ex_heights
-    	targets_dw = np.log(gt_widths*1.0 / ex_widths)
-    	targets_dh = np.log(gt_heights*1.0 / ex_heights)
+    targets_dy = (gt_ctr_y - ex_ctr_y)*1.0 / ex_heights
+    targets_dw = np.log(gt_widths*1.0 / ex_widths)
+    targets_dh = np.log(gt_heights*1.0 / ex_heights)
 
-	#ex_angle = np.pi / 180 * ex_angle
-	#gt_angle = np.pi / 180 * gt_angle
-	
 	targets_da = gt_angle - ex_angle
 
 	targets_da[np.where((gt_angle<=-30) & (ex_angle>=120))]+=180
