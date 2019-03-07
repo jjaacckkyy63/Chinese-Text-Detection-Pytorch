@@ -4,14 +4,29 @@ import collections
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
-from __future__ import division
-
 import torch 
 import random
 import math
 
 import numpy as np
 import cv2
+
+def poly2bbox(poly,image_size):
+    x, y = [],[]
+    for v in poly:
+        x.append(v[0])
+        y.append(v[1])
+    x = np.sort(np.unique(x))
+    y = np.sort(np.unique(y))
+    
+    x1 = np.min(x)/image_size
+    x2 = np.max(x)/image_size
+    y1 = np.min(y)/image_size
+    y2 = np.max(y)/image_size
+    w = x2 - x1
+    h = y2 - y1
+
+    return x1,y1,w,h
 
 def adjust_box(poly):
     key_points = list()
@@ -34,7 +49,6 @@ def rbbox_transform(poly, angle):
     poly_rot = np.dot(rot_mat, poly_ctr) + ctr
     
     return poly_rot
-
 
 # Multi-scale usage
 def get_crop_bboxes(imshape, cropshape, cropoverlap):
