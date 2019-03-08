@@ -7,16 +7,38 @@ from matplotlib.pyplot as plt
 from bbox_toolbox import poly2bbox
 import csv
 
-def darknet_format(src,save_location):
+def darknet_format(src,name_location,save_location):
+    classes = {}
+    abandon_class = {}
     with open(src,"r+") as f:
         annos = f.readlines()
+    with open(name_location) as f:
+        for i,name in enumerate(f):
+            if name == '':
+                continue
+            else:
+                classes[name] = i
+        print(len(classes)) 
     for anno in annos:
         img_id = anno["image_id"]
         bboxes = []
-        for v in anno["polygon"]:
+        for v,t in zip(anno["polygon"],anno["text"]):
             x_c,y_c,w,h = poly2bbox(v, 2048)
-            bboxes.append([x_c,y_c,w,h])
-        with open()
+            try:
+                cls = classes[t]
+                bboxes.append([t,x_c,y_c,w,h])
+            except:
+                try:
+                    abandon_class[t] += 1
+                except:
+                    abandon_class[t] = 1
+        fname = os.path.join(save_location,img_id) + ".txt"
+        with open(fname,"w+",newline="") as f:
+            w = csv.writer(f,delimiter=' ')
+            for b in bboxes:
+                w.writerow(b)
+
+        
 
 
 def draw_bbox_test(img,bbox):
