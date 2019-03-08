@@ -19,14 +19,16 @@ def poly2bbox(poly,image_size):
     x = np.sort(np.unique(x))
     y = np.sort(np.unique(y))
     
-    x1 = np.min(x)/image_size
-    x2 = np.max(x)/image_size
-    y1 = np.min(y)/image_size
-    y2 = np.max(y)/image_size
+    x1 = np.min(x) / image_size
+    x2 = np.max(x) / image_size
+    x_c = (x1+x2) / 2
+    y1 = np.min(y) / image_size
+    y2 = np.max(y) / image_size
+    y_c = (y1+y2) / 2
     w = x2 - x1
     h = y2 - y1
 
-    return x1,y1,w,h
+    return x_c,y_c,w,h
 
 def adjust_box(poly):
     key_points = list()
