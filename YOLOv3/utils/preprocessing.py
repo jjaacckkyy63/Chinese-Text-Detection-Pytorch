@@ -73,8 +73,10 @@ def darknet_format_txt(src,name_location,img_location,txt_name):
     qualified = [x for x in files if x in imgs]
     qualified = [os.path.join(img_location,x) for x in qualified]
 
-    with open(txt_name,"w+") as f:
-        f.writelines(qualified)
+    with open(txt_name,"a+") as f:
+        for line in qualified:
+            f.write(line+"\n")
+            
 
 def draw_bbox_test(img,bbox):
     fig,ax = plt.subplots(1,figsize=(15,15))
