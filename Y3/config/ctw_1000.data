@@ -1,6 +1,6 @@
 classes= 1000
-train=../data/ctw/ctw_train.txt
-valid=../data/ctw/ctw_valid.txt
-names=../data/ctw1000.names
-backup=backup/
+train= data/train1000.txt
+valid= data/val1000.txt
+names= data/ctw1000.names
+backup=weight/
 eval=coco

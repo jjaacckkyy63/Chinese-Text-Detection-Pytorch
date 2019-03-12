@@ -88,5 +88,14 @@ def draw_bbox_test(img,bbox):
 
 if __name__ == "__main__":
 
-    # darknet_format_anno(sys.argv[1],sys.argv[2],sys.argv[3])
-    darknet_format_txt(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
+    train_src = "/home/ej/projects/CTW-Pytorch/annotations/train.jsonl" 
+    valid_src = "/home/ej/projects/CTW-Pytorch/annotations/val.jsonl"
+    name = "/home/ej/projects/CTW-Pytorch/YOLOv3/data/ctw1000.names"
+    save = "/home/ej/projects/CTW-Pytorch/YOLOv3/data/"
+    train_img = "/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images"
+    val_image = "/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images"
+    train_text = "train1000.txt"
+    val_text = "val1000.txt"
+
+    darknet_format_txt(train_src,name,train_img,train_text)
+    darknet_format_txt(valid_src,name,val_image,val_text)
