@@ -1,6 +1,6 @@
-scikit-image
+# pip3 install -U -r requirements.txt
+# conda install numpy opencv matplotlib && conda install pytorch torchvision -c pytorch
 numpy
-torch>=0.4.0
-torchvision
-pillow
+opencv-python
+torch >= 1.0.0
 matplotlib

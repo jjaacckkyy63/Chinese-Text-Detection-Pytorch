@@ -1,165 +1,214 @@
-from __future__ import division
+import argparse
+import json
+import time
+from pathlib import Path
 
 from models import *
-from utils.utils import *
 from utils.datasets import *
-from utils.parse_config import *
+from utils.utils import *
 
-import os
-import sys
-import time
-import datetime
-import argparse
-import tqdm
 
-import torch
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision import transforms
-from torch.autograd import Variable
-import torch.optim as optim
+def test(
+        cfg,
+        data_cfg,
+        weights,
+        batch_size=16,
+        img_size=416,
+        iou_thres=0.5,
+        conf_thres=0.3,
+        nms_thres=0.45,
+        save_json=False
+):
+    device = torch_utils.select_device()
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--batch_size", type=int, default=16, help="size of each image batch")
-parser.add_argument("--model_config_path", type=str, default="config/yolov3.cfg", help="path to model config file")
-parser.add_argument("--data_config_path", type=str, default="config/coco.data", help="path to data config file")
-parser.add_argument("--weights_path", type=str, default="weights/yolov3.weights", help="path to weights file")
-parser.add_argument("--class_path", type=str, default="data/coco.names", help="path to class label file")
-parser.add_argument("--iou_thres", type=float, default=0.5, help="iou threshold required to qualify as detected")
-parser.add_argument("--conf_thres", type=float, default=0.5, help="object confidence threshold")
-parser.add_argument("--nms_thres", type=float, default=0.45, help="iou thresshold for non-maximum suppression")
-parser.add_argument("--n_cpu", type=int, default=0, help="number of cpu threads to use during batch generation")
-parser.add_argument("--img_size", type=int, default=416, help="size of each image dimension")
-parser.add_argument("--use_cuda", type=bool, default=True, help="whether to use cuda if available")
-opt = parser.parse_args()
-print(opt)
+    # Configure run
+    data_cfg_dict = parse_data_cfg(data_cfg)
+    nC = int(data_cfg_dict['classes'])  # number of classes (80 for COCO)
+    test_path = data_cfg_dict['valid']
 
-cuda = torch.cuda.is_available() and opt.use_cuda
+    # Initialize model
+    model = Darknet(cfg, img_size)
 
-# Get data configuration
-data_config = parse_data_config(opt.data_config_path)
-test_path = data_config["valid"]
-num_classes = int(data_config["classes"])
+    # Load weights
+    if weights.endswith('.pt'):  # pytorch format
+        model.load_state_dict(torch.load(weights, map_location='cpu')['model'])
+    else:  # darknet format
+        load_darknet_weights(model, weights)
 
-# Initiate model
-model = Darknet(opt.model_config_path)
-model.load_weights(opt.weights_path)
+    model.to(device).eval()
 
-if cuda:
-    model = model.cuda()
+    # Get dataloader
+    # dataloader = torch.utils.data.DataLoader(LoadImagesAndLabels(test_path), batch_size=batch_size)
+    dataloader = LoadImagesAndLabels(test_path, batch_size=batch_size, img_size=img_size)
 
-model.eval()
+    mean_mAP, mean_R, mean_P, seen = 0.0, 0.0, 0.0, 0
+    print('%11s' * 5 % ('Image', 'Total', 'P', 'R', 'mAP'))
+    outputs, mAPs, mR, mP, TP, confidence, pred_class, target_class, jdict = \
+        [], [], [], [], [], [], [], [], []
+    AP_accum, AP_accum_count = np.zeros(nC), np.zeros(nC)
+    coco91class = coco80_to_coco91_class()
+    for batch_i, (imgs, targets, paths, shapes) in enumerate(dataloader):
+        t = time.time()
+        output = model(imgs.to(device))
+        output = non_max_suppression(output, conf_thres=conf_thres, nms_thres=nms_thres)
 
-# Get dataloader
-dataset = ListDataset(test_path)
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.n_cpu)
+        # Compute average precision for each sample
+        for si, (labels, detections) in enumerate(zip(targets, output)):
+            seen += 1
 
-Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-
-print("Compute mAP...")
-
-all_detections = []
-all_annotations = []
-
-for batch_i, (_, imgs, targets) in enumerate(tqdm.tqdm(dataloader, desc="Detecting objects")):
-
-    imgs = Variable(imgs.type(Tensor))
-
-    with torch.no_grad():
-        outputs = model(imgs)
-        outputs = non_max_suppression(outputs, 80, conf_thres=opt.conf_thres, nms_thres=opt.nms_thres)
-
-    for output, annotations in zip(outputs, targets):
-
-        all_detections.append([np.array([]) for _ in range(num_classes)])
-        if output is not None:
-            # Get predicted boxes, confidence scores and labels
-            pred_boxes = output[:, :5].cpu().numpy()
-            scores = output[:, 4].cpu().numpy()
-            pred_labels = output[:, -1].cpu().numpy()
-
-            # Order by confidence
-            sort_i = np.argsort(scores)
-            pred_labels = pred_labels[sort_i]
-            pred_boxes = pred_boxes[sort_i]
-
-            for label in range(num_classes):
-                all_detections[-1][label] = pred_boxes[pred_labels == label]
-
-        all_annotations.append([np.array([]) for _ in range(num_classes)])
-        if any(annotations[:, -1] > 0):
-
-            annotation_labels = annotations[annotations[:, -1] > 0, 0].numpy()
-            _annotation_boxes = annotations[annotations[:, -1] > 0, 1:]
-
-            # Reformat to x1, y1, x2, y2 and rescale to image dimensions
-            annotation_boxes = np.empty_like(_annotation_boxes)
-            annotation_boxes[:, 0] = _annotation_boxes[:, 0] - _annotation_boxes[:, 2] / 2
-            annotation_boxes[:, 1] = _annotation_boxes[:, 1] - _annotation_boxes[:, 3] / 2
-            annotation_boxes[:, 2] = _annotation_boxes[:, 0] + _annotation_boxes[:, 2] / 2
-            annotation_boxes[:, 3] = _annotation_boxes[:, 1] + _annotation_boxes[:, 3] / 2
-            annotation_boxes *= opt.img_size
-
-            for label in range(num_classes):
-                all_annotations[-1][label] = annotation_boxes[annotation_labels == label, :]
-
-average_precisions = {}
-for label in range(num_classes):
-    true_positives = []
-    scores = []
-    num_annotations = 0
-
-    for i in tqdm.tqdm(range(len(all_annotations)), desc=f"Computing AP for class '{label}'"):
-        detections = all_detections[i][label]
-        annotations = all_annotations[i][label]
-
-        num_annotations += annotations.shape[0]
-        detected_annotations = []
-
-        for *bbox, score in detections:
-            scores.append(score)
-
-            if annotations.shape[0] == 0:
-                true_positives.append(0)
+            if detections is None:
+                # If there are labels but no detections mark as zero AP
+                if labels.size(0) != 0:
+                    mAPs.append(0), mR.append(0), mP.append(0)
                 continue
 
-            overlaps = bbox_iou_numpy(np.expand_dims(bbox, axis=0), annotations)
-            assigned_annotation = np.argmax(overlaps, axis=1)
-            max_overlap = overlaps[0, assigned_annotation]
+            # Get detections sorted by decreasing confidence scores
+            detections = detections.cpu().numpy()
+            detections = detections[np.argsort(-detections[:, 4])]
 
-            if max_overlap >= opt.iou_thres and assigned_annotation not in detected_annotations:
-                true_positives.append(1)
-                detected_annotations.append(assigned_annotation)
+            if save_json:
+                # [{"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}, ...
+                box = torch.from_numpy(detections[:, :4]).clone()  # xyxy
+                scale_coords(img_size, box, shapes[si])  # to original shape
+                box = xyxy2xywh(box)  # xywh
+                box[:, :2] -= box[:, 2:] / 2  # xy center to top-left corner
+
+                # add to json dictionary
+                for di, d in enumerate(detections):
+                    jdict.append({
+                        'image_id': int(Path(paths[si]).stem.split('_')[-1]),
+                        'category_id': coco91class[int(d[6])],
+                        'bbox': [float3(x) for x in box[di]],
+                        'score': float3(d[4] * d[5])
+                    })
+
+            # If no labels add number of detections as incorrect
+            correct = []
+            if labels.size(0) == 0:
+                # correct.extend([0 for _ in range(len(detections))])
+                mAPs.append(0), mR.append(0), mP.append(0)
+                continue
             else:
-                true_positives.append(0)
+                target_cls = labels[:, 0]
 
-    # no annotations -> AP for this class is 0
-    if num_annotations == 0:
-        average_precisions[label] = 0
-        continue
+                # Extract target boxes as (x1, y1, x2, y2)
+                target_boxes = xywh2xyxy(labels[:, 1:5]) * img_size
 
-    true_positives = np.array(true_positives)
-    false_positives = np.ones_like(true_positives) - true_positives
-    # sort by score
-    indices = np.argsort(-np.array(scores))
-    false_positives = false_positives[indices]
-    true_positives = true_positives[indices]
+                detected = []
+                for *pred_bbox, conf, obj_conf, obj_pred in detections:
 
-    # compute false positives and true positives
-    false_positives = np.cumsum(false_positives)
-    true_positives = np.cumsum(true_positives)
+                    pred_bbox = torch.FloatTensor(pred_bbox).view(1, -1)
+                    # Compute iou with target boxes
+                    iou = bbox_iou(pred_bbox, target_boxes)
+                    # Extract index of largest overlap
+                    best_i = np.argmax(iou)
+                    # If overlap exceeds threshold and classification is correct mark as correct
+                    if iou[best_i] > iou_thres and obj_pred == labels[best_i, 0] and best_i not in detected:
+                        correct.append(1)
+                        detected.append(best_i)
+                    else:
+                        correct.append(0)
 
-    # compute recall and precision
-    recall = true_positives / num_annotations
-    precision = true_positives / np.maximum(true_positives + false_positives, np.finfo(np.float64).eps)
+            # Compute Average Precision (AP) per class
+            AP, AP_class, R, P = ap_per_class(tp=correct,
+                                              conf=detections[:, 4],
+                                              pred_cls=detections[:, 6],
+                                              target_cls=target_cls)
 
-    # compute average precision
-    average_precision = compute_ap(recall, precision)
-    average_precisions[label] = average_precision
+            # Accumulate AP per class
+            AP_accum_count += np.bincount(AP_class, minlength=nC)
+            AP_accum += np.bincount(AP_class, minlength=nC, weights=AP)
 
-print("Average Precisions:")
-for c, ap in average_precisions.items():
-    print(f"+ Class '{c}' - AP: {ap}")
+            # Compute mean AP across all classes in this image, and append to image list
+            mAPs.append(AP.mean())
+            mR.append(R.mean())
+            mP.append(P.mean())
 
-mAP = np.mean(list(average_precisions.values()))
-print(f"mAP: {mAP}")
+            # Means of all images
+            mean_mAP = np.mean(mAPs)
+            mean_R = np.mean(mR)
+            mean_P = np.mean(mP)
+
+        # Print image mAP and running mean mAP
+        print(('%11s%11s' + '%11.3g' * 4 + 's') %
+              (seen, dataloader.nF, mean_P, mean_R, mean_mAP, time.time() - t))
+
+    # Print mAP per class
+    print('%11s' * 5 % ('Image', 'Total', 'P', 'R', 'mAP') + '\n\nmAP Per Class:')
+
+    for i, c in enumerate(load_classes(data_cfg_dict['names'])):
+        print('%15s: %-.4f' % (c, AP_accum[i] / (AP_accum_count[i] + 1E-16)))
+
+    # Save JSON
+    if save_json:
+        imgIds = [int(Path(x).stem.split('_')[-1]) for x in dataloader.img_files]
+        with open('results.json', 'w') as file:
+            json.dump(jdict, file)
+
+        from pycocotools.coco import COCO
+        from pycocotools.cocoeval import COCOeval
+
+        # https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb
+        cocoGt = COCO('../coco/annotations/instances_val2014.json')  # initialize COCO ground truth api
+        cocoDt = cocoGt.loadRes('results.json')  # initialize COCO detections api
+
+        cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
+        cocoEval.params.imgIds = imgIds  # [:32]  # only evaluate these images
+        cocoEval.evaluate()
+        cocoEval.accumulate()
+        cocoEval.summarize()
+
+    # Return mAP
+    return mean_mAP, mean_R, mean_P
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog='test.py')
+    parser.add_argument('--batch-size', type=int, default=32, help='size of each image batch')
+    parser.add_argument('--cfg', type=str, default='cfg/yolov3.cfg', help='cfg file path')
+    parser.add_argument('--data-cfg', type=str, default='cfg/coco.data', help='coco.data file path')
+    parser.add_argument('--weights', type=str, default='weights/yolov3.weights', help='path to weights file')
+    parser.add_argument('--iou-thres', type=float, default=0.5, help='iou threshold required to qualify as detected')
+    parser.add_argument('--conf-thres', type=float, default=0.3, help='object confidence threshold')
+    parser.add_argument('--nms-thres', type=float, default=0.45, help='iou threshold for non-maximum suppression')
+    parser.add_argument('--save-json', action='store_true', help='save a cocoapi-compatible JSON results file')
+    parser.add_argument('--img-size', type=int, default=416, help='size of each image dimension')
+    opt = parser.parse_args()
+    print(opt, end='\n\n')
+
+    with torch.no_grad():
+        mAP = test(
+            opt.cfg,
+            opt.data_cfg,
+            opt.weights,
+            opt.batch_size,
+            opt.img_size,
+            opt.iou_thres,
+            opt.conf_thres,
+            opt.nms_thres,
+            opt.save_json
+        )
+
+#       Image      Total          P          R        mAP  # YOLOv3 320
+#          32       5000       0.66      0.597      0.591
+#          64       5000      0.664       0.62      0.604
+#          96       5000      0.653      0.627      0.614
+#         128       5000      0.639      0.623      0.607
+#         160       5000      0.642       0.63      0.616
+#         192       5000      0.651      0.636      0.621
+
+#       Image      Total          P          R        mAP  # YOLOv3 416
+#          32       5000      0.635      0.581       0.57
+#          64       5000       0.63      0.591      0.578
+#          96       5000      0.661      0.632      0.622
+#         128       5000      0.659      0.632      0.623
+#         160       5000      0.665       0.64      0.633
+#         192       5000       0.66      0.637       0.63
+
+#       Image      Total          P          R        mAP  # YOLOv3 608
+#          32       5000      0.653      0.606      0.591
+#          64       5000      0.653      0.635      0.625
+#          96       5000      0.655      0.642      0.633
+#         128       5000      0.667      0.651      0.642
+#         160       5000      0.663      0.645      0.637
+#         192       5000      0.663      0.643      0.634
