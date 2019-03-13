@@ -18,6 +18,9 @@ from torchvision import transforms
 from torch.autograd import Variable
 import torch.optim as optim
 
+import warnings
+warnings.filterwarnings('ignore')
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--epochs", type=int, default=30, help="number of epochs")
 parser.add_argument("--image_folder", type=str, default="data/samples", help="path to dataset")
@@ -76,37 +79,42 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()))
 
 for epoch in range(opt.epochs):
-    for batch_i, (_, imgs, targets) in enumerate(dataloader):
-        imgs = Variable(imgs.type(Tensor))
-        targets = Variable(targets.type(Tensor), requires_grad=False)
+    for batch_i, (img_path, imgs, targets) in enumerate(dataloader):
+        try:    
+            imgs = Variable(imgs.type(Tensor))
+            targets = Variable(targets.type(Tensor), requires_grad=False)
 
-        optimizer.zero_grad()
+            optimizer.zero_grad()
 
-        loss = model(imgs, targets)
+            loss = model(imgs, targets)
+            loss.backward()
+            optimizer.step()
 
-        loss.backward()
-        optimizer.step()
-
-        print(
-            "[Epoch %d/%d, Batch %d/%d] [Losses: x %f, y %f, w %f, h %f, conf %f, cls %f, total %f, recall: %.5f, precision: %.5f]"
-            % (
-                epoch,
-                opt.epochs,
-                batch_i,
-                len(dataloader),
-                model.losses["x"],
-                model.losses["y"],
-                model.losses["w"],
-                model.losses["h"],
-                model.losses["conf"],
-                model.losses["cls"],
-                loss.item(),
-                model.losses["recall"],
-                model.losses["precision"],
+            print(
+                "[Epoch %d/%d, Batch %d/%d] [Losses: x %f, y %f, w %f, h %f, conf %f, cls %f, total %f, recall: %.5f, precision: %.5f]"
+                % (
+                    epoch,
+                    opt.epochs,
+                    batch_i,
+                    len(dataloader),
+                    model.losses["x"],
+                    model.losses["y"],
+                    model.losses["w"],
+                    model.losses["h"],
+                    model.losses["conf"],
+                    model.losses["cls"],
+                    loss.item(),
+                    model.losses["recall"],
+                    model.losses["precision"],
+                )
             )
-        )
 
-        model.seen += imgs.size(0)
+            model.seen += imgs.size(0)
+
+        except Exception as e:
+            with open("bad_data.txt","a+") as f:
+                f.write(img_path[0] + "\n")
+            
 
     if epoch % opt.checkpoint_interval == 0:
         model.save_weights("%s/%d.weights" % (opt.checkpoint_dir, epoch))

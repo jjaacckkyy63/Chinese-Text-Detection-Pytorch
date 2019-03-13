@@ -9,7 +9,7 @@ import csv
 from tqdm import tqdm
 import json
 
-def darknet_format_anno(src,name_location,save_location):
+def darknet_format_anno(src,name_location,save_location,threshold):
     classes = {}
     abandon_class = {}
     with open(src,"r+") as f:
@@ -31,15 +31,20 @@ def darknet_format_anno(src,name_location,save_location):
 
         for text in anno["annotations"]:
             for character in text:
-                x_c,y_c,w,h = poly2bbox(character["polygon"], 2048) 
-                try:
-                    cls = classes[character["text"]]
-                    bboxes.append([cls,x_c,y_c,w,h])
-                except:
+                x_c,y_c,w,h = poly2bbox(character["polygon"], 2048)
+                
+                if x_c > 1 or y_c > 1 or w < threshold or h < threshold:
+                    continue
+                
+                else:
                     try:
-                        abandon_class[character["text"]] += 1
+                        cls = classes[character["text"]]
+                        bboxes.append([cls,x_c,y_c,w,h])
                     except:
-                        abandon_class[character["text"]] = 1
+                        try:
+                            abandon_class[character["text"]] += 1
+                        except:
+                            abandon_class[character["text"]] = 1
         with open(fname,"w",newline="") as f:
             w = csv.writer(f,delimiter=' ')
             for b in bboxes:
@@ -91,11 +96,14 @@ if __name__ == "__main__":
     train_src = "/home/ej/projects/CTW-Pytorch/annotations/train.jsonl" 
     valid_src = "/home/ej/projects/CTW-Pytorch/annotations/val.jsonl"
     name = "/home/ej/projects/CTW-Pytorch/YOLOv3/data/ctw1000.names"
-    save = "/home/ej/projects/CTW-Pytorch/YOLOv3/data/"
+    bbox_save = "/home/ej/projects/CTW-Pytorch/YOLOv3/data/trainval/labels"
     train_img = "/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images"
     val_image = "/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images"
     train_text = "train1000.txt"
     val_text = "val1000.txt"
+    threshold = 0.008
 
+    darknet_format_anno(train_src,name,bbox_save,threshold)
+    darknet_format_anno(valid_src,name,bbox_save,threshold)
     darknet_format_txt(train_src,name,train_img,train_text)
     darknet_format_txt(valid_src,name,val_image,val_text)

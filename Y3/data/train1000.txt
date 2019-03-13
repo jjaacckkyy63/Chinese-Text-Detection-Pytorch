@@ -1,6 +1,5 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1017667.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3029744.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2042445.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3011024.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1033849.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2006020.jpg
@@ -455,7 +454,6 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1044625.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3046778.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2026242.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1004769.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2003153.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3034017.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1041185.jpg
@@ -599,7 +597,6 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3016041.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1026309.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2044316.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3047781.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2003055.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3015251.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2003976.jpg
@@ -1815,7 +1812,6 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1043593.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3044042.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3016024.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3025577.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2009129.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/0001380.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1033905.jpg
@@ -1839,7 +1835,6 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3030416.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2005864.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3007249.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2002097.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1006021.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1029405.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2024105.jpg
@@ -2330,7 +2325,6 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3016656.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2009316.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/1033941.jpg
-/media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2008762.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2025401.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2026344.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3047582.jpg
