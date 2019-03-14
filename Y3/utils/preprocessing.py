@@ -41,10 +41,7 @@ def darknet_format_anno(src,name_location,save_location,threshold):
                         cls = classes[character["text"]]
                         bboxes.append([cls,x_c,y_c,w,h])
                     except:
-                        try:
-                            abandon_class[character["text"]] += 1
-                        except:
-                            abandon_class[character["text"]] = 1
+                        bboxes.append([1000,x_c,y_c,w,h])
         with open(fname,"w",newline="") as f:
             w = csv.writer(f,delimiter=' ')
             for b in bboxes:
