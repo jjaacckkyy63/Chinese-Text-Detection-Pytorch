@@ -59,3 +59,8 @@
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3021613.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/2004203.jpg
 /media/ej/eb1186dc-fe0d-4742-9219-5766b227e606/ej/ctw/data/trainval/images/3028606.jpg
+/home/jovyan/EJ/CTW-Pytorch/ctw_data/trainval/images/1043753.jpg
+/home/jovyan/EJ/CTW-Pytorch/ctw_data/trainval/images/1024229.jpg
+/home/jovyan/EJ/CTW-Pytorch/ctw_data/trainval/images/2005240.jpg
+/home/jovyan/EJ/CTW-Pytorch/ctw_data/trainval/images/1012131.jpg
+/home/jovyan/EJ/CTW-Pytorch/ctw_data/trainval/images/1034661.jpg
