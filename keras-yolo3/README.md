@@ -1,113 +1,99 @@
-# YOLO3 (Detection, Training, and Evaluation)
+# keras-yolo3
 
-## Dataset and Model
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
-Dataset | mAP | Demo | Config | Model
-:---:|:---:|:---:|:---:|:---:
-Kangaroo Detection (1 class) (https://github.com/experiencor/kangaroo) | 95% | https://youtu.be/URO3UDHvoLY | check zoo | http://bit.do/ekQFj
-Raccoon Detection (1 class) (https://github.com/experiencor/raccoon_dataset) | 98% | https://youtu.be/lxLyLIL7OsU | check zoo | http://bit.do/ekQFf
-Red Blood Cell Detection (3 classes) (https://github.com/experiencor/BCCD_Dataset) | 84% | https://imgur.com/a/uJl2lRI | check zoo | http://bit.do/ekQFc
-VOC (20 classes) (http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) | 72% | https://youtu.be/0RmOI6hcfBI | check zoo | http://bit.do/ekQE5
+## Introduction
 
-## Todo list:
-- [x] Yolo3 detection
-- [x] Yolo3 training (warmup and multi-scale)
-- [x] mAP Evaluation
-- [x] Multi-GPU training
-- [x] Evaluation on VOC
-- [ ] Evaluation on COCO
-- [ ] MobileNet, DenseNet, ResNet, and VGG backends
+A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
 
-## Detection
 
-Grab the pretrained weights of yolo3 from https://pjreddie.com/media/files/yolov3.weights.
+---
 
-```python yolo3_one_file_to_detect_them_all.py -w yolo3.weights -i dog.jpg``` 
+## Quick Start
+
+1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
+2. Convert the Darknet YOLO model to a Keras model.
+3. Run YOLO detection.
+
+```
+wget https://pjreddie.com/media/files/yolov3.weights
+python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
+python yolo_video.py [OPTIONS...] --image, for image detection mode, OR
+python yolo_video.py [video_path] [output_path (optional)]
+```
+
+For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
+
+### Usage
+Use --help to see usage of yolo_video.py:
+```
+usage: yolo_video.py [-h] [--model MODEL] [--anchors ANCHORS]
+                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
+                     [--input] [--output]
+
+positional arguments:
+  --input        Video input path
+  --output       Video output path
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --model MODEL      path to model weight file, default model_data/yolo.h5
+  --anchors ANCHORS  path to anchor definitions, default
+                     model_data/yolo_anchors.txt
+  --classes CLASSES  path to class definitions, default
+                     model_data/coco_classes.txt
+  --gpu_num GPU_NUM  Number of GPU to use, default 1
+  --image            Image detection mode, will ignore all positional arguments
+```
+---
+
+4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
 ## Training
 
-### 1. Data preparation 
+1. Generate your own annotation file and class names file.  
+    One row for one image;  
+    Row format: `image_file_path box1 box2 ... boxN`;  
+    Box format: `x_min,y_min,x_max,y_max,class_id` (no space).  
+    For VOC dataset, try `python voc_annotation.py`  
+    Here is an example:
+    ```
+    path/to/img1.jpg 50,100,150,200,0 30,50,200,120,3
+    path/to/img2.jpg 120,300,250,600,2
+    ...
+    ```
 
-Download the Raccoon dataset from from https://github.com/experiencor/raccoon_dataset.
+2. Make sure you have run `python convert.py -w yolov3.cfg yolov3.weights model_data/yolo_weights.h5`  
+    The file model_data/yolo_weights.h5 is used to load pretrained weights.
 
-Organize the dataset into 4 folders:
+3. Modify train.py and start training.  
+    `python train.py`  
+    Use your trained weights or checkpoint weights with command line option `--model model_file` when using yolo_video.py
+    Remember to modify class path or anchor path, with `--classes class_file` and `--anchors anchor_file`.
 
-+ train_image_folder <= the folder that contains the train images.
+If you want to use original pretrained weights for YOLOv3:  
+    1. `wget https://pjreddie.com/media/files/darknet53.conv.74`  
+    2. rename it as darknet53.weights  
+    3. `python convert.py -w darknet53.cfg darknet53.weights model_data/darknet53_weights.h5`  
+    4. use model_data/darknet53_weights.h5 in train.py
 
-+ train_annot_folder <= the folder that contains the train annotations in VOC format.
+---
 
-+ valid_image_folder <= the folder that contains the validation images.
+## Some issues to know
 
-+ valid_annot_folder <= the folder that contains the validation annotations in VOC format.
-    
-There is a one-to-one correspondence by file name between images and annotations. If the validation set is empty, the training set will be automatically splitted into the training set and validation set using the ratio of 0.8.
+1. The test environment is
+    - Python 3.5.2
+    - Keras 2.1.5
+    - tensorflow 1.6.0
 
-### 2. Edit the configuration file
-The configuration file is a json file, which looks like this:
+2. Default anchors are used. If you use your own anchors, probably some changes are needed.
 
-```python
-{
-    "model" : {
-        "min_input_size":       352,
-        "max_input_size":       448,
-        "anchors":              [10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326],
-        "labels":               ["raccoon"]
-    },
+3. The inference result is not totally the same as Darknet but the difference is small.
 
-    "train": {
-        "train_image_folder":   "/home/andy/data/raccoon_dataset/images/",
-        "train_annot_folder":   "/home/andy/data/raccoon_dataset/anns/",      
-          
-        "train_times":          10,             # the number of time to cycle through the training set, useful for small datasets
-        "pretrained_weights":   "",             # specify the path of the pretrained weights, but it's fine to start from scratch
-        "batch_size":           16,             # the number of images to read in each batch
-        "learning_rate":        1e-4,           # the base learning rate of the default Adam rate scheduler
-        "nb_epoch":             50,             # number of epoches
-        "warmup_epochs":        3,              # the number of initial epochs during which the sizes of the 5 boxes in each cell is forced to match the sizes of the 5 anchors, this trick seems to improve precision emperically
-        "ignore_thresh":        0.5,
-        "gpus":                 "0,1",
+4. The speed is slower than Darknet. Replacing PIL with opencv may help a little.
 
-        "saved_weights_name":   "raccoon.h5",
-        "debug":                true            # turn on/off the line that prints current confidence, position, size, class losses and recall
-    },
+5. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
 
-    "valid": {
-        "valid_image_folder":   "",
-        "valid_annot_folder":   "",
+6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
 
-        "valid_times":          1
-    }
-}
-
-```
-
-The ```labels``` setting lists the labels to be trained on. Only images, which has labels being listed, are fed to the network. The rest images are simply ignored. By this way, a Dog Detector can easily be trained using VOC or COCO dataset by setting ```labels``` to ```['dog']```.
-
-Download pretrained weights for backend at:
-
-https://1drv.ms/u/s!ApLdDEW3ut5fgQXa7GzSlG-mdza6
-
-**This weights must be put in the root folder of the repository. They are the pretrained weights for the backend only and will be loaded during model creation. The code does not work without this weights.**
-
-### 3. Generate anchors for your dataset (optional)
-
-`python gen_anchors.py -c config.json`
-
-Copy the generated anchors printed on the terminal to the ```anchors``` setting in ```config.json```.
-
-### 4. Start the training process
-
-`python train.py -c config.json`
-
-By the end of this process, the code will write the weights of the best model to file best_weights.h5 (or whatever name specified in the setting "saved_weights_name" in the config.json file). The training process stops when the loss on the validation set is not improved in 3 consecutive epoches.
-
-### 5. Perform detection using trained weights on image, set of images, video, or webcam
-`python predict.py -c config.json -i /path/to/image/or/video`
-
-It carries out detection on the image and write the image with detected bounding boxes to the same folder.
-
-## Evaluation
-
-`python evaluate.py -c config.json`
-
-Compute the mAP performance of the model defined in `saved_weights_name` on the validation dataset defined in `valid_image_folder` and `valid_annot_folder`.
+7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
