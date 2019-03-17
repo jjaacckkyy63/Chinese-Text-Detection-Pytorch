@@ -1,6 +1,0 @@
-classes= 1000
-train= data/train1000.txt
-valid= data/val1000.txt
-names= data/ctw1000.names
-backup=weight/
-eval=coco
