@@ -35,7 +35,7 @@ Distortation +/- 30%
 
 # Inference
 
-Run `detect.py` to apply trained weights to an image, such as `zidane.jpg` from the `data/samples` folder:
+Run `detect.py` to apply trained weights to an image
 
 **YOLOv3:** `detect.py --cfg cfg/yolov3.cfg --weights weights/yolov3.pt`
 
