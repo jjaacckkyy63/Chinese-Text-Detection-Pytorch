@@ -12,6 +12,8 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
 
 ### Training
 
+Gtx 1080 ti 12G RAM * 1  
+
 **Start Training:** Run `train.py` to begin training 
 
 **Transfer Learning** Run 'train.py --resume' to start from pretrained weighta
@@ -34,6 +36,7 @@ HSV Intensity | +/- 50%
 Distortation | +/- 30%
 
 ### Inference
+
 Please put test images into yolov3/data/samples,the result will appear in output/
 Run `detect.py` to apply trained weights to an image
 
@@ -41,7 +44,15 @@ Run `detect.py` to apply trained weights to an image
 
 Run `test.py` to validate 
 
-#### Red-Round Traffic Sign Detection
-127 epoches
+1. Red-Round Traffic Sign Detection
+*127 epoches*
 ![](test_result.jpg?raw=true)
 
+2. Text Detection
+*145 epoch*
+training details : 
+num of epoch | resolution 
+---|---
+1-50 | 416x416
+51-100 | 608x608
+101-145 | 608-960(multi-scale)
