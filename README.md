@@ -18,8 +18,9 @@ Gtx 1080 ti 12G RAM * 1
 
 **Transfer Learning** Run 'train.py --resume' to start from pretrained weighta
 
-**classes** 1. traffic sign detection : 3 classes 
-            2. Chinese 
+**num of class** 
+1. traffic sign detection : 3 classes 
+2. Chinese text : 1 class
 
 ### Image Augmentation Detail
 [Reference](https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4)
@@ -37,7 +38,9 @@ Distortation | +/- 30%
 
 ### Inference
 
-Please put test images into yolov3/data/samples,the result will appear in output/
+Please put test images into 
+`yolov3/data/samples`
+result will appear in `output/`
 Run `detect.py` to apply trained weights to an image
 
 ### Performance
