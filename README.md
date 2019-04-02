@@ -18,7 +18,8 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
             2. Chinese 
 
 ### Image Augmentation Detail
-
+Aug.| Description
+---|---
 Translation | +/- 10% (vertical and horizontal)
 Rotation | +/- 5 degrees
 Shear | +/- 2 degrees (vertical and horizontal)
