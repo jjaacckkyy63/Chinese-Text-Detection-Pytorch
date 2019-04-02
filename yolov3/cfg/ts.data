@@ -1,0 +1,6 @@
+classes=3
+train=/home/jovyan/EJ/CTW-Pytorch/data/ts_train.txt
+valid=/home/jovyan/EJ/CTW-Pytorch/data/ts_val.txt
+names=/home/jovyan/EJ/CTW-Pytorch/yolov3/data/ts.names
+backup=backup/
+eval=coco

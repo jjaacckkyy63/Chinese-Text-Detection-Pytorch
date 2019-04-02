@@ -20,12 +20,12 @@ def train(
         var=0,
 ):
     weights = 'weights' + os.sep
-    latest = weights + 'latest.pt'
-    best = weights + 'best.pt'
+    latest = weights + 'ctw_latest.pt'
+    best = weights + 'ctw_best.pt'
     device = torch_utils.select_device()
 
     if multi_scale:  # pass maximum multi_scale size
-        img_size = 480
+        img_size = 608
     else:
         torch.backends.cudnn.benchmark = True  # unsuitable for multiscale
 
@@ -181,12 +181,12 @@ def train(
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=300, help='number of epochs')
-    parser.add_argument('--batch-size', type=int, default=8, help='size of each image batch')
+    parser.add_argument('--batch-size', type=int, default=16, help='size of each image batch')
     parser.add_argument('--accumulated-batches', type=int, default=1, help='number of batches before optimizer step')
     parser.add_argument('--cfg', type=str, default='cfg/yolov3.cfg', help='cfg file path')
-    parser.add_argument('--data-cfg', type=str, default='cfg/ts.data', help='ts.data file path')
+    parser.add_argument('--data-cfg', type=str, default='cfg/ctw.data', help='ts.data file path')
     parser.add_argument('--multi-scale', action='store_true', help='random image sizes per batch 320 - 608')
-    parser.add_argument('--img-size', type=int, default=32 * 13, help='pixels')
+    parser.add_argument('--img-size', type=int, default=416, help='pixels')
     parser.add_argument('--resume', action='store_true', help='resume training flag')
     parser.add_argument('--var', type=float, default=0, help='test variable')
     opt = parser.parse_args()
