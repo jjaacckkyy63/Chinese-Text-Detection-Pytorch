@@ -14,10 +14,11 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
 
 **Start Training:** Run `train.py` to begin training 
 **Transfer Learning** Run 'train.py --resume' to start from pretrained weighta
-**classes** 1. traffic sign detection : 3 classes
+**classes** 1. traffic sign detection : 3 classes 
             2. Chinese 
 
 ### Image Augmentation Detail
+[link Reference](https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4)
 Aug.| Description
 ---|---
 Translation | +/- 10% (vertical and horizontal)
