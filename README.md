@@ -49,14 +49,14 @@ Run `test.py` to validate
 ![](test_result.jpg?raw=true)
 
 2. Text Detection
-*145 epoch*
+*50 epoch*
 training details : 
 
 num of epoch | resolution 
 ---|---
-1-50 | 416x416
-51-100 | 608x608
-101-145 | 608-960(multi-scale)
+1-15 | 416x416
+16-35 | 608x608
+36-50 | 608-960(multi-scale)
 
 ![](result.jpg?raw=true)
 (resume from 100 epoches)
