@@ -16,9 +16,9 @@ Gtx 1080 ti 12G RAM * 1
 
 **Start Training:** Run `train.py` to begin training 
 
-**Transfer Learning** Run 'train.py --resume' to start from pretrained weight
+**Transfer Learning** Run `train.py --resume` to start from pretrained weight
 
-**Multi-Scale** Run 'train.py --multi-scale'
+**Multi-Scale** Run `train.py --multi-scale`
 
 **num of class** 
 1. traffic sign detection : 3 classes 
