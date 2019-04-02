@@ -43,4 +43,5 @@ Run `test.py` to validate
 
 #### Red-Round Traffic Sign Detection
 67 epoches
+![](test_result.jpg?raw=true)
 
