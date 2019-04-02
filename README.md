@@ -1,5 +1,5 @@
 
-# Recognize-Chinese-Characters-on-Traffic-Signs
+# Recognize Chinese Characters on Traffic Signs
 
 ## YOLOv3
 ### Requirements
