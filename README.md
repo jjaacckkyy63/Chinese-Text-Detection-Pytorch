@@ -17,10 +17,7 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
 
 **Start Training:** Run `train.py` to begin training 
 
-
 ## Image Augmentation
-
-
 
 Augmentation | Description
 --- | ---
@@ -43,3 +40,4 @@ Run `detect.py` to apply trained weights to an image
 
 Run `test.py` to validate 
 
+# Results for Red-Round Traffic Sign Detection
