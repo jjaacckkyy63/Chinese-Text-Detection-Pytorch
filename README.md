@@ -16,7 +16,9 @@ Gtx 1080 ti 12G RAM * 1
 
 **Start Training:** Run `train.py` to begin training 
 
-**Transfer Learning** Run 'train.py --resume' to start from pretrained weighta
+**Transfer Learning** Run 'train.py --resume' to start from pretrained weight
+
+**Multi-Scale** Run 'train.py --multi-scale'
 
 **num of class** 
 1. traffic sign detection : 3 classes 
@@ -62,5 +64,9 @@ num of epoch | resolution
 36-50 | 608-960(multi-scale)
 
 ![](result.jpg?raw=true)
-(resume from 100 epoches)
+
+### Issues and future work
+1. Multi-GPU training
+2. Text detection and classification
+3. Combine with specific type of sign
 
