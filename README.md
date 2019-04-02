@@ -13,7 +13,9 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
 ### Training
 
 **Start Training:** Run `train.py` to begin training 
+
 **Transfer Learning** Run 'train.py --resume' to start from pretrained weighta
+
 **classes** 1. traffic sign detection : 3 classes 
             2. Chinese 
 
@@ -27,8 +29,8 @@ Rotation | +/- 5 degrees
 Shear | +/- 2 degrees (vertical and horizontal)
 Scale | +/- 10%
 Reflection | 50% probability (horizontal-only)
-H**S**V Saturation | +/- 50%
-HS**V** Intensity | +/- 50%
+HSV Saturation | +/- 50%
+HSV Intensity | +/- 50%
 Distortation | +/- 30%
 
 ### Inference
