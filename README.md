@@ -19,6 +19,7 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
 
 ### Image Augmentation Detail
 [link Reference](https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4)
+
 Aug.| Description
 ---|---
 Translation | +/- 10% (vertical and horizontal)
