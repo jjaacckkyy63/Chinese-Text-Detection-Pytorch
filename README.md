@@ -51,6 +51,7 @@ Run `test.py` to validate
 2. Text Detection
 *145 epoch*
 training details : 
+
 num of epoch | resolution 
 ---|---
 1-50 | 416x416
