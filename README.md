@@ -57,3 +57,7 @@ num of epoch | resolution
 1-50 | 416x416
 51-100 | 608x608
 101-145 | 608-960(multi-scale)
+
+![](result.jpg?raw=true)
+(resume from 100 epoches)
+
