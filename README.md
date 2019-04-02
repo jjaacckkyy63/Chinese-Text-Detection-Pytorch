@@ -18,7 +18,7 @@ Python 3.7 or later with the following `pip3 install -U -r requirements.txt` pac
             2. Chinese 
 
 ### Image Augmentation Detail
-[link Reference](https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4)
+[Reference](https://medium.com/uruvideo/dataset-augmentation-with-random-homographies-a8f4b44830d4)
 
 Aug.| Description
 ---|---
