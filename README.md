@@ -42,6 +42,6 @@ Run `detect.py` to apply trained weights to an image
 Run `test.py` to validate 
 
 #### Red-Round Traffic Sign Detection
-67 epoches
+127 epoches
 ![](test_result.jpg?raw=true)
 
