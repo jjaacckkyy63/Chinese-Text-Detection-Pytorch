@@ -50,6 +50,7 @@ Run `detect.py` to apply trained weights to an image
 Run `test.py` to validate 
 
 1. Red-Round Traffic Sign Detection
+(from TSRD dataset of NSFC)
 *127 epoches*
 ![](test_result.jpg?raw=true)
 
