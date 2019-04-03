@@ -67,6 +67,8 @@ num of epoch | resolution
 36-50 | 608-960(multi-scale)
 
 ![](result.jpg?raw=true)
+![](sample1.jpg?raw=true)
+![](sample2.jpg?raw=true)
 
 ### Issues and future work
 1. Multi-GPU training
